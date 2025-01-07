@@ -44,7 +44,7 @@ def _parse_tracking_result(result: list[str], sep: str) -> list[TrackingRecord]:
     return items
 
 
-async def track_shipment(
+async def track_parcel(
     tracking_number: str,
     sep: str = " | ",
     timeout: Optional[float] = None,
@@ -60,7 +60,7 @@ async def track_shipment(
         # Open the post tracking website
         await page.goto("https://tracking.post.ir/", wait_until="load", timeout=timeout)
 
-        # Input the shipment number
+        # Input the tracking number
         await page.fill("#txtbSearch", tracking_number)
 
         # Clicking the search button

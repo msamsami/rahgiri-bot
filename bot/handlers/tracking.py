@@ -8,7 +8,7 @@ from bot.utils.text import (
     normalize_text,
     warning_msg,
 )
-from bot.utils.tracking import track_shipment, validate_tracking_number
+from bot.utils.tracking import track_parcel, validate_tracking_number
 
 from .start import handle_start
 
@@ -73,7 +73,7 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
         await update.message.reply_text("در حال رهگیری...", quote=True)
 
         try:
-            tracking_records = await track_shipment(tracking_number, timeout=15000, normalizer=normalize_text)
+            tracking_records = await track_parcel(tracking_number, timeout=15000, normalizer=normalize_text)
         except Exception:
             await update.message.reply_text(error_msg("عملیات با خطا مواجه شد."))
             await handle_start(update, context)

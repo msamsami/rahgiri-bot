@@ -1,7 +1,7 @@
 [project]
 name = "rahgiri-bot"
 version = "0.1.0"
-description = "A Telegram bot for tracking shipments via the Iran Post Tracking System."
+description = "A Telegram bot for tracking parcels via the Iran Post Tracking System."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
@@ -10,7 +10,6 @@ dependencies = [
     "pydantic-settings>=2.7.1",
     "python-telegram-bot>=21.9",
 ]
-
 
 [dependency-groups]
 dev = [
