@@ -1,3 +1,5 @@
+from typing import Optional
+
 from telegram import Message, Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -10,6 +12,8 @@ from telegram.ext import (
 from bot.config import settings
 from bot.enums import Command
 from bot.keyboards.markups import keyboard_markup_back
+from bot.models import TrackingRecord
+from bot.utils.exceptions import TrackingError
 from bot.utils.text import (
     error_msg,
     format_tracking_record,
@@ -88,24 +92,28 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
         await _delete_last_message(update, context)
         await update.message.reply_text("🔄 در حال رهگیری...", quote=True)
 
+        tracking_records: Optional[list[TrackingRecord]] = None
         try:
             tracking_records = await track_parcel(tracking_number, timeout=settings.tracking_timeout, normalizer=normalize_text)
+        except TrackingError as e:
+            await update.message.reply_text(error_msg(str(e)))
         except Exception:
-            await update.message.reply_text(error_msg("عملیات با خطا مواجه شد."))
+            await update.message.reply_text(error_msg("عملیات با خطا مواجه شد. لطفا دقایقی دیگر مجددا تلاش کنید."))
             await handle_start(update, context)
             _end_conversation(context)
             raise
 
-        if tracking_records:
-            reply_text = "\n\n".join(
-                [
-                    f"شماره رهگیری: *{tracking_number}*",
-                ]
-                + [format_tracking_record(record) for record in tracking_records]
-            )
-            await update.message.reply_text(reply_text, parse_mode="markdown")
-        else:
-            await update.message.reply_text(warning_msg("نتیجه ای یافت نشد."))
+        if tracking_records is not None:
+            if tracking_records:
+                reply_text = "\n\n".join(
+                    [
+                        f"✅ شماره رهگیری: *{tracking_number}*",
+                    ]
+                    + [format_tracking_record(record) for record in tracking_records]
+                )
+                await update.message.reply_text(reply_text, parse_mode="markdown")
+            else:
+                await update.message.reply_text(warning_msg("نتیجه ای یافت نشد!"))
 
         await handle_start(update, context)
         return _end_conversation(context)

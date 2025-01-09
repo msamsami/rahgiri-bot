@@ -5,6 +5,8 @@ from playwright.async_api import async_playwright
 
 from bot.models import TrackingRecord
 
+from .exceptions import TrackingError
+
 __all__ = ("validate_tracking_number", "track_parcel")
 
 
@@ -19,6 +21,7 @@ def validate_tracking_number(tracking_number: str) -> bool:
     Returns:
         bool: True if the tracking number is valid, False otherwise.
     """
+    tracking_number = tracking_number.strip()
     return len(tracking_number) == 24 and tracking_number.isdigit()
 
 
@@ -73,6 +76,9 @@ async def track_parcel(
 
     Returns:
         list[TrackingRecord]: A list of `TrackingRecord` items containing the parsed tracking records.
+
+    Raises:
+        TrackingError: If the tracking service returns an error message. The error message is returned as the exception message.
     """
     result: list[str] = []
     sep = " | "
@@ -95,6 +101,12 @@ async def track_parcel(
         # Fetch all divs with class 'row'
         all_row_divs = await page.query_selector_all("#pnlResult div.row")
 
+        # Check if the tracking service returned an error message
+        if not all_row_divs:
+            alert_divs = await page.query_selector_all("#pnlResult div.alert")
+            if alert_divs:
+                raise TrackingError(await alert_divs[0].text_content())
+
         # Extract and clean data from each row
         for div in all_row_divs:
             columns = await div.query_selector_all("div.newtddata")
@@ -104,9 +116,6 @@ async def track_parcel(
             if not row_data:
                 continue
             result.append(sep.join(data.strip() for data in row_data if data))
-
-        # Close the browser
-        await browser.close()
 
     if result and normalizer:
         result = [normalizer(item) for item in result]
