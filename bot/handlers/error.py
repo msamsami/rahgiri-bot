@@ -2,14 +2,15 @@ import html
 import json
 import logging
 import traceback
-from typing import Optional
 
 from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+from bot.config import settings
 
-async def handle_error(update: object, context: ContextTypes.DEFAULT_TYPE, chat_id: Optional[int | str] = None) -> None:
+
+async def handle_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Log the error and optionally send a telegram message to notify the developer.
     """
@@ -31,8 +32,8 @@ async def handle_error(update: object, context: ContextTypes.DEFAULT_TYPE, chat_
         f"<pre>{html.escape(tb_string)}</pre>"
     )
 
-    if chat_id:
+    if settings.developer_chat_id:
         try:
-            await context.bot.send_message(chat_id=chat_id, text=message, parse_mode=ParseMode.HTML)
+            await context.bot.send_message(chat_id=settings.developer_chat_id, text=message, parse_mode=ParseMode.HTML)
         except Exception as e:
             logging.error(f"Failed to send error message to developer chat: {e}")
