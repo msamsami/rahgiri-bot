@@ -1,6 +1,14 @@
 from telegram import Message, Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import (
+    CallbackQueryHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
 
+from bot.config import settings
+from bot.enums import Command
 from bot.keyboards.markups import keyboard_markup_back
 from bot.utils.text import (
     error_msg,
@@ -11,6 +19,9 @@ from bot.utils.text import (
 from bot.utils.tracking import track_parcel, validate_tracking_number
 
 from .start import handle_start
+
+__all__ = ("handle_tracking_number", "handle_tracking_process", "tracking_conversation_handler")
+
 
 START_TRACKING = 0
 IS_TRACKING_FLAG = "is_tracking"
@@ -35,6 +46,9 @@ def _end_conversation(context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def handle_tracking_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Handler for tracking number input.
+    """
     msg_text = "شماره رهگیری مرسوله را وارد کنید."
 
     if update.callback_query:
@@ -55,6 +69,9 @@ async def handle_tracking_number(update: Update, context: ContextTypes.DEFAULT_T
 
 
 async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """
+    Handler for parcel tracking process.
+    """
     if not update.message or not context.user_data or not context.user_data.get(IS_TRACKING_FLAG):
         return _end_conversation(context)
 
@@ -69,11 +86,10 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
     else:
         context.user_data.pop(IS_TRACKING_FLAG, None)
         await _delete_last_message(update, context)
-
-        await update.message.reply_text("در حال رهگیری...", quote=True)
+        await update.message.reply_text("🔄 در حال رهگیری...", quote=True)
 
         try:
-            tracking_records = await track_parcel(tracking_number, timeout=15000, normalizer=normalize_text)
+            tracking_records = await track_parcel(tracking_number, timeout=settings.tracking_timeout, normalizer=normalize_text)
         except Exception:
             await update.message.reply_text(error_msg("عملیات با خطا مواجه شد."))
             await handle_start(update, context)
@@ -93,3 +109,19 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
 
         await handle_start(update, context)
         return _end_conversation(context)
+
+
+tracking_conversation_handler = ConversationHandler(
+    entry_points=[
+        CallbackQueryHandler(handle_tracking_number, pattern=Command.TRACK),
+    ],
+    states={
+        START_TRACKING: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_tracking_process),
+        ],
+    },
+    fallbacks=[
+        CallbackQueryHandler(handle_start, pattern=Command.START),
+    ],
+    allow_reentry=True,
+)
