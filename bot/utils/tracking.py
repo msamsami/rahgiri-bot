@@ -5,8 +5,20 @@ from playwright.async_api import async_playwright
 
 from bot.models import TrackingRecord
 
+__all__ = ("validate_tracking_number", "track_parcel")
+
 
 def validate_tracking_number(tracking_number: str) -> bool:
+    """Validate a parcel tracking number.
+
+    A valid tracking number should be 24 digits long and consist only of digits.
+
+    Args:
+        tracking_number (str): The tracking number to validate.
+
+    Returns:
+        bool: True if the tracking number is valid, False otherwise.
+    """
     return len(tracking_number) == 24 and tracking_number.isdigit()
 
 
@@ -46,11 +58,24 @@ def _parse_tracking_result(result: list[str], sep: str) -> list[TrackingRecord]:
 
 async def track_parcel(
     tracking_number: str,
-    sep: str = " | ",
     timeout: Optional[float] = None,
     normalizer: Optional[Callable[[str], str]] = None,
 ) -> list[TrackingRecord]:
+    """Track a parcel using its tracking number by scraping the Iran Post Tracking website.
+
+    This function uses Playwright to automate a browser session to fetch tracking information
+    from the tracking website. It processes the data to extract and return relevant tracking records.
+
+    Args:
+        tracking_number (str): The tracking number of the parcel to be tracked.
+        timeout (Optional[float]): The timeout for the tracking website to load, in seconds. Defaults to None for 30 seconds.
+        normalizer (Optional[Callable[[str], str]]): A function to normalize the extracted text data. Defaults to None.
+
+    Returns:
+        list[TrackingRecord]: A list of `TrackingRecord` items containing the parsed tracking records.
+    """
     result: list[str] = []
+    sep = " | "
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
@@ -58,10 +83,8 @@ async def track_parcel(
         page = await context.new_page()
 
         # Open the post tracking website
-        await page.goto("https://tracking.post.ir/", wait_until="load", timeout=timeout)
-
-        # Input the tracking number
-        await page.fill("#txtbSearch", tracking_number)
+        timeout_ms = timeout * 1000 if timeout else None
+        await page.goto(f"https://tracking.post.ir/?id={tracking_number}", wait_until="load", timeout=timeout_ms)
 
         # Clicking the search button
         await page.click("#btnSearch")
