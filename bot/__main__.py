@@ -10,9 +10,6 @@ from bot.handlers.tracking import tracking_conversation_handler
 
 from .config import settings
 
-__version__ = "0.1.0"
-
-
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
