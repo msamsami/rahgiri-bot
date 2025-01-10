@@ -18,7 +18,7 @@ Rahgiri Bot is a Telegram bot that helps users track their parcels through the I
 - [Iran Post Tracking](https://tracking.post.ir/) - For providing the tracking service
 
 ## Support
-💡 If you encounter any problems or have suggestions, please [open an issue](https://github.com/msamsami/rahgiri-bot/issues).  
+💡 If you encounter any problems or have suggestions, please [open an issue](https://github.com/msamsami/rahgiri-bot/issues).
 
 ⭐ Don't forget to star the repository if you find it useful!
 
