@@ -7,32 +7,6 @@ WORKDIR /app
 # Allowing read, write, and execute permissions
 RUN chmod 777 /app
 
-# Install system dependencies required for Playwright and Chromium
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libnss3 \
-    libnspr4 \
-    libdbus-1-3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxfixes3 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    libatspi2.0-0 \
-    libexpat1 \
-    libx11-6 \
-    libxcb1 \
-    libxext6 \
-    libxi6 \
-    libxtst6 \
-    && rm -rf /var/lib/apt/lists/*
-
 # Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
 
@@ -55,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Install playwright browser
-RUN python -m playwright install chromium
+RUN python -m playwright install chromium --with-deps
 
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []

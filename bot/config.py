@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     tracking_timeout: int | float = 15
     """Tracking timeout, in seconds."""
 
+    proxy_url: Optional[str] = None
+    """Proxy URL to use for opening the tracking website."""
+
     developer_chat_id: Optional[str] = None
     """Developer chat ID for error notifications."""
 
