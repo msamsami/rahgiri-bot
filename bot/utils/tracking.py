@@ -1,7 +1,7 @@
 from typing import Callable, Optional
 
 from fake_useragent import UserAgent
-from playwright.async_api import async_playwright
+from playwright.async_api import ProxySettings, async_playwright
 
 from bot.models import TrackingRecord
 
@@ -63,6 +63,7 @@ async def track_parcel(
     tracking_number: str,
     timeout: Optional[float] = None,
     normalizer: Optional[Callable[[str], str]] = None,
+    proxy: Optional[ProxySettings] = None,
 ) -> list[TrackingRecord]:
     """Track a parcel using its tracking number by scraping the Iran Post Tracking website.
 
@@ -73,6 +74,7 @@ async def track_parcel(
         tracking_number (str): The tracking number of the parcel to be tracked.
         timeout (Optional[float]): The timeout for the tracking website to load, in seconds. Defaults to None for 30 seconds.
         normalizer (Optional[Callable[[str], str]]): A function to normalize the extracted text data. Defaults to None.
+        proxy (Optional[ProxySettings]): A proxy settings to use for opening the tracking website. Defaults to None.
 
     Returns:
         list[TrackingRecord]: A list of `TrackingRecord` items containing the parsed tracking records.
@@ -85,7 +87,7 @@ async def track_parcel(
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context(user_agent=UserAgent().random)
+        context = await browser.new_context(user_agent=UserAgent().random, proxy=proxy)
         page = await context.new_page()
 
         # Open the post tracking website

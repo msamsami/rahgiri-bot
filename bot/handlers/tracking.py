@@ -1,5 +1,6 @@
 from typing import Optional
 
+from playwright.async_api import ProxySettings
 from telegram import Message, Update
 from telegram.ext import (
     CallbackQueryHandler,
@@ -94,7 +95,12 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
 
         tracking_records: Optional[list[TrackingRecord]] = None
         try:
-            tracking_records = await track_parcel(tracking_number, timeout=settings.tracking_timeout, normalizer=normalize_text)
+            proxy = None
+            if settings.proxy_url:
+                proxy = ProxySettings(server=settings.proxy_url)
+            tracking_records = await track_parcel(
+                tracking_number, timeout=settings.tracking_timeout, normalizer=normalize_text, proxy=proxy
+            )
         except TrackingError as e:
             await update.message.reply_text(error_msg(str(e)))
         except Exception:
