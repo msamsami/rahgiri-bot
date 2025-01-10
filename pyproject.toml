@@ -15,6 +15,7 @@ dependencies = [
 dev = [
     "isort>=5.13.2",
     "mypy>=1.14.1",
+    "pre-commit>=4.0.1",
     "ruff>=0.8.4",
 ]
 
@@ -35,4 +36,3 @@ line-length = 130
 atomic = true
 profile = "black"
 known_first_party = ["black", "blib2to3", "blackd", "_black_version"]
-
