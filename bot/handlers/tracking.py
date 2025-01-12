@@ -94,14 +94,10 @@ async def handle_tracking_result_type(update: Update, context: ContextTypes.DEFA
     context.user_data["tracking_number"] = tracking_number
 
     msg_text = "نوع نمایش نتیجه رهگیری را انتخاب کنید."
-    if update.message:
-        message = await update.message.reply_text(msg_text, reply_markup=keyboard_markup_tracking_output_type)
-    else:
-        return _end_conversation(context)
+    message = await update.message.reply_text(msg_text, reply_markup=keyboard_markup_tracking_output_type)
 
     context.user_data[IS_TRACKING_FLAG_KEY] = True
-    if isinstance(message, Message):
-        context.user_data[LAST_MESSAGE_ID_KEY] = message.message_id
+    context.user_data[LAST_MESSAGE_ID_KEY] = message.message_id
 
     return WAITING_FOR_RESULT_TYPE
 
@@ -152,7 +148,6 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
         )
         context.user_data[REDIRECT_FROM_TRACKING_KEY] = True
         await handle_start(update, context)
-        _end_conversation(context)
         raise
 
     if tracking_result is not None:
@@ -177,7 +172,7 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
 
     context.user_data[REDIRECT_FROM_TRACKING_KEY] = True
     await handle_start(update, context)
-    return _end_conversation(context)
+    return ConversationHandler.END
 
 
 tracking_conversation_handler = ConversationHandler(
