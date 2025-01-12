@@ -14,9 +14,6 @@ async def handle_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     query = update.callback_query
     await query.answer()
 
-    if context.user_data is not None:
-        context.user_data.clear()
-
     help_text = "\n".join(
         [
             "📬 ربات تلگرام *رهگیری مرسولات پستی*\n",
