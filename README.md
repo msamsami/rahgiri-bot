@@ -1,6 +1,6 @@
 # Rahgiri Bot
 
-![](https://img.shields.io/badge/release-v0.4.0-blue)
+![](https://img.shields.io/badge/release-v0.5.0-blue)
 ![](https://img.shields.io/badge/python-3.11-green)
 
 
@@ -10,6 +10,7 @@ Rahgiri Bot is a Telegram bot that helps users track their parcels through the I
 ## Features
 - 📦 Track parcels using tracking numbers
 - 🔄 Real-time status updates
+- 📄 View tracking results in text or as image
 - 📝 Save and manage multiple tracking numbers (coming soon)
 - 🔔 Automatic status notifications (coming soon)
 
