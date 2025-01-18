@@ -1,6 +1,6 @@
 # Rahgiri Bot
 
-![](https://img.shields.io/badge/release-v0.5.1-blue)
+![](https://img.shields.io/badge/release-v0.5.2-blue)
 ![](https://img.shields.io/badge/python-3.11-green)
 
 
