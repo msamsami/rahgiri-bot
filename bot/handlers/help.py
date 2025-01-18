@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from bot.keyboards.markups import keyboard_markup_back
@@ -24,4 +25,4 @@ async def handle_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         ]
     )
 
-    await query.edit_message_text(help_text, reply_markup=keyboard_markup_back, parse_mode="markdown")
+    await query.edit_message_text(help_text, reply_markup=keyboard_markup_back, parse_mode=ParseMode.MARKDOWN)

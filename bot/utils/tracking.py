@@ -62,7 +62,8 @@ class ParcelTracker:
             yield page
             await browser.close()
 
-    async def _extract_tracking_rows(self, page: Page) -> list[ElementHandle]:
+    @staticmethod
+    async def _extract_tracking_rows(page: Page) -> list[ElementHandle]:
         await page.click("#btnSearch")
         await page.wait_for_selector("#pnlMain")
 
