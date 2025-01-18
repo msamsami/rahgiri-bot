@@ -2,6 +2,7 @@ from typing import Optional
 
 from playwright.async_api import ProxySettings
 from telegram import Message, Update
+from telegram.constants import ParseMode
 from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes,
@@ -124,7 +125,7 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
     await context.bot.send_message(
         chat_id=query.message.chat.id,
         text="\n\n".join(["🔄 در حال رهگیری...", f"(نوع نمایش: *{result_type_fa}*)"]),
-        parse_mode="markdown",
+        parse_mode=ParseMode.MARKDOWN,
     )
 
     tracking_result: Optional[list[TrackingRecord] | bytes] = None
@@ -156,7 +157,7 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
                 chat_id=query.message.chat.id,
                 photo=tracking_result,
                 caption=f"✅ شماره رهگیری: *{tracking_number}*",
-                parse_mode="markdown",
+                parse_mode=ParseMode.MARKDOWN,
             )
         else:
             if tracking_result:
@@ -166,7 +167,7 @@ async def handle_tracking_process(update: Update, context: ContextTypes.DEFAULT_
                     ]
                     + [format_tracking_record(record) for record in tracking_result]
                 )
-                await context.bot.send_message(chat_id=query.message.chat.id, text=reply_text, parse_mode="markdown")
+                await context.bot.send_message(chat_id=query.message.chat.id, text=reply_text, parse_mode=ParseMode.MARKDOWN)
             else:
                 await context.bot.send_message(chat_id=query.message.chat.id, text=warning_msg("نتیجه ای یافت نشد!"))
 
